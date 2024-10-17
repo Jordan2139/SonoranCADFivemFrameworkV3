@@ -76,9 +76,9 @@ Config.GetPluginConfig = function(pluginName)
             'smartsigns' then
             return {enabled = false, disableReason = 'deprecated plugin'}
         end
-        correctConfig = LoadResourceFile(
-                            GetCurrentResourceName(), '/submodules/' ..
-                                pluginName .. '/' .. pluginName .. '_config.lua')
+        correctConfig = LoadResourceFile(GetCurrentResourceName(),
+                                         '/submodules/' .. pluginName .. '/' ..
+                                             pluginName .. '_config.lua')
         if not correctConfig then
             infoLog(
                 ('Plugin %s only has the default configurations file (%s_config.dist.lua)... Attempting to rename config to: %s_config.lua'):format(
@@ -95,15 +95,15 @@ Config.GetPluginConfig = function(pluginName)
                 warnLog(
                     ('Using default configurations for %s. Please rename %s_config.dist.lua to %s_config.lua to avoid seeing this message'):format(
                         pluginName, pluginName, pluginName))
-                correctConfig = LoadResourceFile(
-                                    GetCurrentResourceName(), '/submodules/' ..
-                                        pluginName .. '/' .. pluginName ..
-                                        '_config.dist.lua')
+                correctConfig = LoadResourceFile(GetCurrentResourceName(),
+                                                 '/submodules/' .. pluginName ..
+                                                     '/' .. pluginName ..
+                                                     '_config.dist.lua')
             else
-                correctConfig = LoadResourceFile(
-                                    GetCurrentResourceName(), '/submodules/' ..
-                                        pluginName .. '/' .. pluginName ..
-                                        '_config.lua')
+                correctConfig = LoadResourceFile(GetCurrentResourceName(),
+                                                 '/submodules/' .. pluginName ..
+                                                     '/' .. pluginName ..
+                                                     '_config.lua')
             end
         end
         if not correctConfig then
@@ -119,14 +119,52 @@ Config.GetPluginConfig = function(pluginName)
                 disableReason = 'Missing configuration file'
             }
         else
-            Config.plugins[pluginName] = correctConfig
-            if Config.critError then
-                Config.plugins[pluginName].enabled = false
-                Config.plugins[pluginName].disableReason = 'startup aborted'
-            elseif Config.plugins[pluginName].enabled == nil then
-                Config.plugins[pluginName].enabled = true
-            elseif Config.plugins[pluginName].enabled == false then
-                Config.plugins[pluginName].disableReason = 'Disabled'
+            local loadedPlugin, pluginError = load(correctConfig)
+            if loadedPlugin then
+                local success, res = pcall(loadedPlugin)
+                if not success then
+                    errorLog(
+                        ('Plugin %s failed to load due to error: %s'):format(
+                            pluginName, res))
+                    Config.plugins[pluginName] = {
+                        enabled = false,
+                        disableReason = 'Failed to load'
+                    }
+                    return {enabled = false, disableReason = 'Failed to load'}
+                end
+                if _G.config and type(_G.config) == "table" then
+                    -- Assign the extracted config to Config.plugins[pluginName]
+                    Config.plugins[pluginName] = _G.config
+                else
+                    -- Handle case where config is not available
+                    errorLog(
+                        ('Plugin %s did not define a valid config table.'):format(
+                            pluginName))
+                    Config.plugins[pluginName] = {
+                        enabled = false,
+                        disableReason = 'Invalid or missing config'
+                    }
+                    return {
+                        enabled = false,
+                        disableReason = 'Invalid or missing config'
+                    }
+                end
+                if Config.critError then
+                    Config.plugins[pluginName].enabled = false
+                    Config.plugins[pluginName].disableReason = 'startup aborted'
+                elseif Config.plugins[pluginName].enabled == nil then
+                    Config.plugins[pluginName].enabled = true
+                elseif Config.plugins[pluginName].enabled == false then
+                    Config.plugins[pluginName].disableReason = 'Disabled'
+                end
+            else
+                errorLog(('Plugin %s failed to load due to error: %s'):format(
+                             pluginName, pluginError))
+                Config.plugins[pluginName] = {
+                    enabled = false,
+                    disableReason = 'Failed to load'
+                }
+                return {enabled = false, disableReason = 'Failed to load'}
             end
             return Config.plugins[pluginName]
         end
@@ -153,9 +191,9 @@ Config.LoadPlugin = function(pluginName, cb)
         if pluginName == 'yourpluginname' then
             return cb({enabled = false, disableReason = 'Template plugin'})
         end
-        correctConfig = LoadResourceFile(
-                            GetCurrentResourceName(), '/submodules/' ..
-                                pluginName .. '/' .. pluginName .. '_config.lua')
+        correctConfig = LoadResourceFile(GetCurrentResourceName(),
+                                         '/submodules/' .. pluginName .. '/' ..
+                                             pluginName .. '_config.lua')
         if not correctConfig then
             infoLog(
                 ('Plugin %s only has the default configurations file (%s_config.dist.lua)... Attempting to rename config to: %s_config.lua'):format(
@@ -172,15 +210,15 @@ Config.LoadPlugin = function(pluginName, cb)
                 warnLog(
                     ('Using default configurations for %s. Please rename %s_config.dist.lua to %s_config.lua to avoid seeing this message'):format(
                         pluginName, pluginName, pluginName))
-                correctConfig = LoadResourceFile(
-                                    GetCurrentResourceName(), '/submodules/' ..
-                                        pluginName .. '/' .. pluginName ..
-                                        '_config.dist.lua')
+                correctConfig = LoadResourceFile(GetCurrentResourceName(),
+                                                 '/submodules/' .. pluginName ..
+                                                     '/' .. pluginName ..
+                                                     '_config.dist.lua')
             else
-                correctConfig = LoadResourceFile(
-                                    GetCurrentResourceName(), '/submodules/' ..
-                                        pluginName .. '/' .. pluginName ..
-                                        '_config.lua')
+                correctConfig = LoadResourceFile(GetCurrentResourceName(),
+                                                 '/submodules/' .. pluginName ..
+                                                     '/' .. pluginName ..
+                                                     '_config.lua')
             end
         end
         if not correctConfig then
@@ -196,16 +234,54 @@ Config.LoadPlugin = function(pluginName, cb)
                 disableReason = 'Missing configuration file'
             })
         else
-            Config.plugins[pluginName] = correctConfig
-            if Config.critError then
-                Config.plugins[pluginName].enabled = false
-                Config.plugins[pluginName].disableReason = 'startup aborted'
-            elseif Config.plugins[pluginName].enabled == nil then
-                Config.plugins[pluginName].enabled = true
-            elseif Config.plugins[pluginName].enabled == false then
-                Config.plugins[pluginName].disableReason = 'Disabled'
+            local loadedPlugin, pluginError = load(correctConfig)
+            if loadedPlugin then
+                local success, res = pcall(loadedPlugin)
+                if not success then
+                    errorLog(
+                        ('Plugin %s failed to load due to error: %s'):format(
+                            pluginName, res))
+                    Config.plugins[pluginName] = {
+                        enabled = false,
+                        disableReason = 'Failed to load'
+                    }
+                    return {enabled = false, disableReason = 'Failed to load'}
+                end
+                if _G.config and type(_G.config) == "table" then
+                    -- Assign the extracted config to Config.plugins[pluginName]
+                    Config.plugins[pluginName] = _G.config
+                else
+                    -- Handle case where config is not available
+                    errorLog(
+                        ('Plugin %s did not define a valid config table.'):format(
+                            pluginName))
+                    Config.plugins[pluginName] = {
+                        enabled = false,
+                        disableReason = 'Invalid or missing config'
+                    }
+                    return cb({
+                        enabled = false,
+                        disableReason = 'Invalid or missing config'
+                    })
+                end
+                if Config.critError then
+                    Config.plugins[pluginName].enabled = false
+                    Config.plugins[pluginName].disableReason = 'startup aborted'
+                elseif Config.plugins[pluginName].enabled == nil then
+                    Config.plugins[pluginName].enabled = true
+                elseif Config.plugins[pluginName].enabled == false then
+                    Config.plugins[pluginName].disableReason = 'Disabled'
+                end
+            else
+                errorLog(('Plugin %s failed to load due to error: %s'):format(
+                             pluginName, pluginError))
+                Config.plugins[pluginName] = {
+                    enabled = false,
+                    disableReason = 'Failed to load'
+                }
+                return cb({enabled = false, disableReason = 'Failed to load'})
             end
-            return Config.plugins[pluginName]
+            return cb(Config.plugins[pluginName])
         end
         Config.plugins[pluginName] = {
             enabled = false,
