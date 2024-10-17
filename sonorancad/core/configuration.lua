@@ -59,6 +59,7 @@ local function CopyFile(old_path, new_path)
 end
 
 Config.GetPluginConfig = function(pluginName)
+    local correctConfig = nil
     if Config.plugins[pluginName] ~= nil then
         if Config.critError then
             Config.plugins[pluginName].enabled = false
@@ -75,35 +76,37 @@ Config.GetPluginConfig = function(pluginName)
             'smartsigns' then
             return {enabled = false, disableReason = 'deprecated plugin'}
         end
-        local correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                               'submodules/' .. pluginName ..
-                                                   '/' .. pluginName .. '/' ..
-                                                   pluginName .. '_config.lua')
+        correctConfig = LoadResourceFile(
+                            GetCurrentResourceName(), '/submodules/' ..
+                                pluginName .. '/' .. pluginName .. '_config.lua')
         if not correctConfig then
             infoLog(
                 ('Plugin %s only has the default configurations file (%s_config.dist.lua)... Attempting to rename config to: %s_config.lua'):format(
                     pluginName, pluginName, pluginName))
             if not CopyFile(GetResourcePath(GetCurrentResourceName()) ..
                                 '/submodules/' .. pluginName .. '/' ..
-                                pluginName .. '/' .. pluginName ..
-                                '_config.dist.lua',
+                                pluginName .. '_config.dist.lua',
                             GetResourcePath(GetCurrentResourceName()) ..
                                 '/submodules/' .. pluginName .. '/' ..
-                                pluginName .. '/' .. pluginName .. '_config.lua') then
+                                pluginName .. '_config.lua') then
                 warnLog(
                     ('Failed to rename %s_config.dist.lua to %s_config.lua'):format(
                         pluginName, pluginName))
                 warnLog(
                     ('Using default configurations for %s. Please rename %s_config.dist.lua to %s_config.lua to avoid seeing this message'):format(
                         pluginName, pluginName, pluginName))
-                correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                                 'submodules/' .. pluginName ..
-                                                     '/' .. pluginName .. '/' ..
-                                                     pluginName ..
-                                                     '_config.dist.lua')
+                correctConfig = LoadResourceFile(
+                                    GetCurrentResourceName(), '/submodules/' ..
+                                        pluginName .. '/' .. pluginName ..
+                                        '_config.dist.lua')
+            else
+                correctConfig = LoadResourceFile(
+                                    GetCurrentResourceName(), '/submodules/' ..
+                                        pluginName .. '/' .. pluginName ..
+                                        '_config.lua')
             end
         end
-        if not LoadResourceFile(correctConfig) then
+        if not correctConfig then
             warnLog(
                 ('Plugin %s is missing critical configuration. Please check our plugin install guide at https://info.sonorancad.com/integration-submodules/integration-submodules/plugin-installation for steps to properly install.'):format(
                     pluginName))
@@ -116,7 +119,7 @@ Config.GetPluginConfig = function(pluginName)
                 disableReason = 'Missing configuration file'
             }
         else
-			Config.plugins[pluginName] = correctConfig
+            Config.plugins[pluginName] = correctConfig
             if Config.critError then
                 Config.plugins[pluginName].enabled = false
                 Config.plugins[pluginName].disableReason = 'startup aborted'
@@ -136,6 +139,7 @@ Config.GetPluginConfig = function(pluginName)
 end
 
 Config.LoadPlugin = function(pluginName, cb)
+    local correctConfig = nil
     while Config.apiVersion == -1 do Wait(1) end
     if Config.plugins[pluginName] ~= nil then
         if Config.critError then
@@ -149,35 +153,37 @@ Config.LoadPlugin = function(pluginName, cb)
         if pluginName == 'yourpluginname' then
             return cb({enabled = false, disableReason = 'Template plugin'})
         end
-        local correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                               'submodules/' .. pluginName ..
-                                                   '/' .. pluginName .. '/' ..
-                                                   pluginName .. '_config.lua')
+        correctConfig = LoadResourceFile(
+                            GetCurrentResourceName(), '/submodules/' ..
+                                pluginName .. '/' .. pluginName .. '_config.lua')
         if not correctConfig then
             infoLog(
                 ('Plugin %s only has the default configurations file (%s_config.dist.lua)... Attempting to rename config to: %s_config.lua'):format(
                     pluginName, pluginName, pluginName))
             if not CopyFile(GetResourcePath(GetCurrentResourceName()) ..
                                 '/submodules/' .. pluginName .. '/' ..
-                                pluginName .. '/' .. pluginName ..
-                                '_config.dist.lua',
+                                pluginName .. '_config.dist.lua',
                             GetResourcePath(GetCurrentResourceName()) ..
                                 '/submodules/' .. pluginName .. '/' ..
-                                pluginName .. '/' .. pluginName .. '_config.lua') then
+                                pluginName .. '_config.lua') then
                 warnLog(
                     ('Failed to rename %s_config.dist.lua to %s_config.lua'):format(
                         pluginName, pluginName))
                 warnLog(
                     ('Using default configurations for %s. Please rename %s_config.dist.lua to %s_config.lua to avoid seeing this message'):format(
                         pluginName, pluginName, pluginName))
-                correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                                 'submodules/' .. pluginName ..
-                                                     '/' .. pluginName .. '/' ..
-                                                     pluginName ..
-                                                     '_config.dist.lua')
+                correctConfig = LoadResourceFile(
+                                    GetCurrentResourceName(), '/submodules/' ..
+                                        pluginName .. '/' .. pluginName ..
+                                        '_config.dist.lua')
+            else
+                correctConfig = LoadResourceFile(
+                                    GetCurrentResourceName(), '/submodules/' ..
+                                        pluginName .. '/' .. pluginName ..
+                                        '_config.lua')
             end
         end
-        if not LoadResourceFile(correctConfig) then
+        if not correctConfig then
             warnLog(
                 ('Plugin %s is missing critical configuration. Please check our plugin install guide at https://info.sonorancad.com/integration-submodules/integration-submodules/plugin-installation for steps to properly install.'):format(
                     pluginName))
@@ -190,7 +196,7 @@ Config.LoadPlugin = function(pluginName, cb)
                 disableReason = 'Missing configuration file'
             })
         else
-			Config.plugins[pluginName] = correctConfig
+            Config.plugins[pluginName] = correctConfig
             if Config.critError then
                 Config.plugins[pluginName].enabled = false
                 Config.plugins[pluginName].disableReason = 'startup aborted'

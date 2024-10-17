@@ -12,6 +12,7 @@ Config.RegisterPluginConfig = function(pluginName, configs)
 end
 
 Config.GetPluginConfig = function(pluginName)
+    local correctConfig = nil
     if Config.plugins[pluginName] ~= nil then
         if Config.critError then
             Config.plugins[pluginName].enabled = false
@@ -26,25 +27,24 @@ Config.GetPluginConfig = function(pluginName)
         if pluginName == 'yourpluginname' then
             return {enabled = false, disableReason = 'Template plugin'}
         end
-        local correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                               'submodules/' .. pluginName ..
-                                                   '/' .. pluginName .. '/' ..
-                                                   pluginName .. '_config.lua')
+        correctConfig = LoadResourceFile(GetCurrentResourceName(),
+                                         '/submodules/' .. pluginName .. '/' ..
+                                             pluginName .. '_config.lua')
         if not correctConfig then
             infoLog(
                 ('Plugin %s only has the default configurations file (%s_config.dist.lua)... Attempting to use default file'):format(
                     pluginName, pluginName))
             correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                             'submodules/' .. pluginName .. '/' ..
-                                                 pluginName .. '/' .. pluginName ..
+                                             '/submodules/' .. pluginName .. '/' ..
+                                                 pluginName ..
                                                  '_config.dist.lua')
         end
-        if not LoadResourceFile(correctConfig) then
+        if not correctConfig then
             warnLog(
                 ('Plugin %s is missing critical configuration. Please check our plugin install guide at https://info.sonorancad.com/integration-submodules/integration-submodules/plugin-installation for steps to properly install.'):format(
                     pluginName))
         else
-			Config.plugins[pluginName] = correctConfig
+            Config.plugins[pluginName] = correctConfig
             if Config.critError then
                 Config.plugins[pluginName].enabled = false
                 Config.plugins[pluginName].disableReason = 'startup aborted'
@@ -64,6 +64,7 @@ Config.GetPluginConfig = function(pluginName)
 end
 
 Config.LoadPlugin = function(pluginName, cb)
+    local correctConfig = nil
     while Config.apiVersion == -1 do Wait(1) end
     if Config.plugins[pluginName] ~= nil then
         if Config.critError then
@@ -79,25 +80,27 @@ Config.LoadPlugin = function(pluginName, cb)
         if pluginName == 'yourpluginname' then
             return cb({enabled = false, disableReason = 'Template plugin'})
         end
-        local correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                               'submodules/' .. pluginName ..
-                                                   '/' .. pluginName .. '/' ..
-                                                   pluginName .. '_config.lua')
+        print('file path',
+              GetCurrentResourceName() .. '/submodules/' .. pluginName .. '/' ..
+                  pluginName .. '_config.lua')
+        correctConfig = LoadResourceFile(GetCurrentResourceName(),
+                                         '/submodules/' .. pluginName .. '/' ..
+                                             pluginName .. '_config.lua')
         if not correctConfig then
             infoLog(
                 ('Plugin %s only has the default configurations file (%s_config.dist.lua)... Attempting to use default file'):format(
                     pluginName, pluginName))
             correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                             'submodules/' .. pluginName .. '/' ..
-                                                 pluginName .. '/' .. pluginName ..
+                                             '/submodules/' .. pluginName .. '/' ..
+                                                 pluginName ..
                                                  '_config.dist.lua')
         end
-        if not LoadResourceFile(correctConfig) then
+        if not correctConfig then
             warnLog(
                 ('Plugin %s is missing critical configuration. Please check our plugin install guide at https://info.sonorancad.com/integration-submodules/integration-submodules/plugin-installation for steps to properly install.'):format(
                     pluginName))
         else
-			Config.plugins[pluginName] = correctConfig
+            Config.plugins[pluginName] = correctConfig
             if Config.critError then
                 Config.plugins[pluginName].enabled = false
                 Config.plugins[pluginName].disableReason = 'startup aborted'
