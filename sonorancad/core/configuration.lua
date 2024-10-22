@@ -77,18 +77,17 @@ Config.GetPluginConfig = function(pluginName)
             return {enabled = false, disableReason = 'deprecated plugin'}
         end
         correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                         '/submodules/' .. pluginName .. '/' ..
-                                             pluginName .. '_config.lua')
+                                         '/configuration/' .. pluginName ..
+                                             '_config.lua')
         if not correctConfig then
             infoLog(
                 ('Plugin %s only has the default configurations file (%s_config.dist.lua)... Attempting to rename config to: %s_config.lua'):format(
                     pluginName, pluginName, pluginName))
             if not CopyFile(GetResourcePath(GetCurrentResourceName()) ..
-                                '/submodules/' .. pluginName .. '/' ..
-                                pluginName .. '_config.dist.lua',
+                                '/configuration/' .. pluginName ..
+                                '_config.dist.lua',
                             GetResourcePath(GetCurrentResourceName()) ..
-                                '/submodules/' .. pluginName .. '/' ..
-                                pluginName .. '_config.lua') then
+                                '/configuration/' .. pluginName .. '_config.lua') then
                 warnLog(
                     ('Failed to rename %s_config.dist.lua to %s_config.lua'):format(
                         pluginName, pluginName))
@@ -96,13 +95,11 @@ Config.GetPluginConfig = function(pluginName)
                     ('Using default configurations for %s. Please rename %s_config.dist.lua to %s_config.lua to avoid seeing this message'):format(
                         pluginName, pluginName, pluginName))
                 correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                                 '/submodules/' .. pluginName ..
-                                                     '/' .. pluginName ..
+                                                 '/configuration/' .. pluginName ..
                                                      '_config.dist.lua')
             else
                 correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                                 '/submodules/' .. pluginName ..
-                                                     '/' .. pluginName ..
+                                                 '/configuration/' .. pluginName ..
                                                      '_config.lua')
             end
         end
@@ -192,18 +189,17 @@ Config.LoadPlugin = function(pluginName, cb)
             return cb({enabled = false, disableReason = 'Template plugin'})
         end
         correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                         '/submodules/' .. pluginName .. '/' ..
-                                             pluginName .. '_config.lua')
+                                         '/configuration/' .. pluginName ..
+                                             '_config.lua')
         if not correctConfig then
             infoLog(
                 ('Plugin %s only has the default configurations file (%s_config.dist.lua)... Attempting to rename config to: %s_config.lua'):format(
                     pluginName, pluginName, pluginName))
             if not CopyFile(GetResourcePath(GetCurrentResourceName()) ..
-                                '/submodules/' .. pluginName .. '/' ..
-                                pluginName .. '_config.dist.lua',
+                                '/configuration/' .. pluginName ..
+                                '_config.dist.lua',
                             GetResourcePath(GetCurrentResourceName()) ..
-                                '/submodules/' .. pluginName .. '/' ..
-                                pluginName .. '_config.lua') then
+                                '/configuration/' .. pluginName .. '_config.lua') then
                 warnLog(
                     ('Failed to rename %s_config.dist.lua to %s_config.lua'):format(
                         pluginName, pluginName))
@@ -211,13 +207,11 @@ Config.LoadPlugin = function(pluginName, cb)
                     ('Using default configurations for %s. Please rename %s_config.dist.lua to %s_config.lua to avoid seeing this message'):format(
                         pluginName, pluginName, pluginName))
                 correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                                 '/submodules/' .. pluginName ..
-                                                     '/' .. pluginName ..
+                                                 '/configuration/' .. pluginName ..
                                                      '_config.dist.lua')
             else
                 correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                                 '/submodules/' .. pluginName ..
-                                                     '/' .. pluginName ..
+                                                 '/configuration/' .. pluginName ..
                                                      '_config.lua')
             end
         end
@@ -291,7 +285,8 @@ Config.LoadPlugin = function(pluginName, cb)
     end
 end
 
-local conf = LoadResourceFile(GetCurrentResourceName(), 'config.json')
+local conf = LoadResourceFile(GetCurrentResourceName(),
+                              '/configuration/config.json')
 if conf == nil then
     errorLog(
         'CONFIG_ERROR: Unable to load configuration file. Ensure the file is named correctly (config.json). Check for extra extensions (like config.json.json).')

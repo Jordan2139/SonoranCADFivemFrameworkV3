@@ -28,15 +28,14 @@ Config.GetPluginConfig = function(pluginName)
             return {enabled = false, disableReason = 'Template plugin'}
         end
         correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                         '/submodules/' .. pluginName .. '/' ..
-                                             pluginName .. '_config.lua')
+                                         '/configuration/' .. pluginName ..
+                                             '_config.lua')
         if not correctConfig then
             infoLog(
                 ('Plugin %s only has the default configurations file (%s_config.dist.lua)... Attempting to use default file'):format(
                     pluginName, pluginName))
             correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                             '/submodules/' .. pluginName .. '/' ..
-                                                 pluginName ..
+                                             '/configuration/' .. pluginName ..
                                                  '_config.dist.lua')
         end
         if not correctConfig then
@@ -80,19 +79,15 @@ Config.LoadPlugin = function(pluginName, cb)
         if pluginName == 'yourpluginname' then
             return cb({enabled = false, disableReason = 'Template plugin'})
         end
-        print('file path',
-              GetCurrentResourceName() .. '/submodules/' .. pluginName .. '/' ..
-                  pluginName .. '_config.lua')
         correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                         '/submodules/' .. pluginName .. '/' ..
-                                             pluginName .. '_config.lua')
+                                         '/configuration/' .. pluginName ..
+                                             '_config.lua')
         if not correctConfig then
             infoLog(
                 ('Plugin %s only has the default configurations file (%s_config.dist.lua)... Attempting to use default file'):format(
                     pluginName, pluginName))
             correctConfig = LoadResourceFile(GetCurrentResourceName(),
-                                             '/submodules/' .. pluginName .. '/' ..
-                                                 pluginName ..
+                                             '/configuration/' .. pluginName ..
                                                  '_config.dist.lua')
         end
         if not correctConfig then
